@@ -12,3 +12,7 @@
 - Javascript
 - Twitter Bootstrap
 - Mercado Livre API
+
+## Preview
+
+![Alt Text](./images/deepin-screen-recorder_Select-area_20210321143921.gif)
