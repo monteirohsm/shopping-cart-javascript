@@ -44,7 +44,7 @@ function createCartItemElement({ sku, name, salePrice }) {
   const li = document.createElement('li');
   li.className = 'cart__item';
   li.classList.add(`${sku}`);
-  li.innerText = `SKU: ${sku} | NAME: ${name} | PRICE: $${salePrice}`;
+  li.innerText = `NAME: ${name} | PRICE: $${salePrice}`;
   li.addEventListener('click', cartItemClickListener);
   return li;
 }
@@ -61,14 +61,38 @@ function stopLoading() {
   loadingLocal.remove();
 }
 
-async function createProductList() {
+async function createProductList(query) {
   const endpoint =
-    'https://api.mercadolibre.com/sites/MLB/search?q=$computador';
+    `https://api.mercadolibre.com/sites/MLB/search?q=${query}`;
   try {
     const response = await fetch(endpoint);
     const objectJson = await response.json();
     const objectJsonResults = objectJson.results;
-    console.log(objectJson);
+    const sectionLocal = document.querySelector('.items');
+
+    objectJsonResults.forEach((element) => {
+      const { id: sku, title: name, thumbnail: image } = element;
+      const itemsForSale = createProductItemElement({ sku, name, image });
+      sectionLocal.append(itemsForSale);
+    });
+  } catch (error) {
+    alert('Error');
+  }
+  stopLoading();
+}
+
+async function createNewProductList(query) {
+  startLoading()
+  const getItemList = document.querySelectorAll('.item');
+  for (index = 0; index < getItemList.length; index += 1) {
+    getItemList[index].remove()
+  }
+  const endpoint =
+    `https://api.mercadolibre.com/sites/MLB/search?q=${query}`;
+  try {
+    const response = await fetch(endpoint);
+    const objectJson = await response.json();
+    const objectJsonResults = objectJson.results;
     const sectionLocal = document.querySelector('.items');
 
     objectJsonResults.forEach((element) => {
@@ -130,10 +154,22 @@ function removeAllItems() {
   });
 }
 
+function onClickFetch() {
+
+  const submitBtn = document.querySelector('.submit-api')
+  const getInput = document.querySelector('.search-input')
+  submitBtn.addEventListener('click', () => {
+    createNewProductList(getInput.value)
+  });
+
+}
+
 window.onload = function onload() {
   createProductList();
   addItemToCart();
   removeAllItems();
   startLoading();
   onLoadPush();
+  onClickFetch()
 };
+
